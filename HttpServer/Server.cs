@@ -10,11 +10,14 @@ namespace HttpServer
 {
     class Server
     {
-        int port = default;
+        int port ;
         TcpListener listener;
+        string ipLocal;
         bool isRunning = false;
+        
         public Server(int port)
         {
+            this.port = port;
             listener = new TcpListener(IPAddress.Any, port);
         }
         //Поток принимает в себя делегат
@@ -22,40 +25,47 @@ namespace HttpServer
         {
             Thread thread = new Thread(new ThreadStart(run));
             thread.Start();
-            isRunning = true;
         }
         
         private void run()
         {
             listener.Start();
-            string server = GetMyLocalIp();
-            Console.WriteLine($"Сервак стартанул на:{server}");
+
+            isRunning = true;
+            string localIP = GetMyLocalIp();
+            Console.WriteLine($"Сервак стартанул на: {localIP}");
+
             while (isRunning)
             {
                 TcpClient client = listener.AcceptTcpClient();
+
                 Console.WriteLine("Client подключился");
                 HandleClient(client);
-                listener.Stop();
+                client.Close();
+
+                Http
             }
 
         }
+
 
         private void HandleClient(TcpClient client)
         {
             StreamReader reader = new StreamReader(client.GetStream());
-            string data = default;
-            while (reader.Peek() != 1)
+            string data = "";
+            while(reader.Peek() != -1) //тут фикс Пик заканчивает цикл при получении -1 
             {
                 data += reader.ReadLine() + "\n";
-
             }
-            Console.WriteLine($"REQ:{data}");
-
+            Console.WriteLine($"REQ:\r\n{data}");
         }
+
         //TODO: функция возвращает локальный ИП 
         private string GetMyLocalIp()
         {
-            return Dns.GetHostName().ToString();
+            IPHostEntry name = Dns.GetHostEntry(Dns.GetHostName());
+            string ip = name.AddressList[name.AddressList.Length - 1].ToString();
+            return ip;
         }
     }
 }
