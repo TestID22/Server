@@ -18,7 +18,8 @@ namespace HttpServer
         public Server(int port)
         {
             this.port = port;
-            listener = new TcpListener(IPAddress.Any, port);
+            ipLocal = GetMyLocalIp();
+            listener = new TcpListener(IPAddress.Parse(ipLocal), port);
         }
         //Поток принимает в себя делегат
         public void start()
@@ -43,7 +44,6 @@ namespace HttpServer
                 HandleClient(client);
                 client.Close();
 
-                Http
             }
 
         }
@@ -51,20 +51,30 @@ namespace HttpServer
 
         private void HandleClient(TcpClient client)
         {
-            StreamReader reader = new StreamReader(client.GetStream());
-            string data = "";
-            while(reader.Peek() != -1) //тут фикс Пик заканчивает цикл при получении -1 
+
+            using (StreamReader reader = new StreamReader(client.GetStream()))
             {
-                data += reader.ReadLine() + "\n";
+                string data = "";
+                while (reader.Peek()!=-1) //тут фикс Пик заканчивает цикл при получении -1 
+                {
+                    data += reader.ReadLine() + "\n";
+                }
+                Console.WriteLine($"REQ:\r\n{data}");
+
+                //TODO: Обработка запроса, создание ответа.
+                Request request = Request.GetRequest(data);
+                Response response = Response.From(request);
+                response.Post(client.GetStream());
+
             }
-            Console.WriteLine($"REQ:\r\n{data}");
+
         }
 
         //TODO: функция возвращает локальный ИП 
         private string GetMyLocalIp()
         {
             IPHostEntry name = Dns.GetHostEntry(Dns.GetHostName());
-            string ip = name.AddressList[name.AddressList.Length - 1].ToString();
+            string ip = name.AddressList[^1].ToString();
             return ip;
         }
     }

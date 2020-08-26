@@ -9,7 +9,6 @@ namespace HttpServer
         {
             Server server = new Server(8080);
             server.start();
-
         }
     }
 }
