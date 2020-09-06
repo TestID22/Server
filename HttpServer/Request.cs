@@ -6,16 +6,15 @@ namespace HttpServer
 {
     class Request
     {
-        string host;
-        string url;
-        string directory;
+        public string host;
+        public string url;
+        public string type;
 
         private Request(string host, string url, string directory)
         {
             this.host = host;
             this.url = url;
-            this.directory = directory;
-
+            this.type = directory;
         }
 
 
@@ -26,7 +25,8 @@ namespace HttpServer
                 return null;
             }
             string[] data = clientData.Split("\n");
-            Console.WriteLine($"Hots {data[1]}\n, URL = {data[0].Split(" ")[1]}\n, Type :{data[0]}\n");
+
+            Console.WriteLine($"Hots {data[1]}\n, URL = {data[0].Split(" ")[1]}\n, Type :{data[0].Split(" ")[0]}\n");
             return new Request(data[3], data[1], data[0]);
         }
     }

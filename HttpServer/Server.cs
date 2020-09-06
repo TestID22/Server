@@ -14,7 +14,10 @@ namespace HttpServer
         TcpListener listener;
         string ipLocal;
         bool isRunning = false;
-        
+        public const string VERSION = "HTTP/1.0";
+        public const string SERVERNAME = "septemberServer";
+
+
         public Server(int port)
         {
             this.port = port;
@@ -42,7 +45,7 @@ namespace HttpServer
 
                 Console.WriteLine("Client подключился");
                 HandleClient(client);
-                client.Close();
+                //client.Close();
 
             }
 
@@ -64,12 +67,19 @@ namespace HttpServer
                 //TODO: Обработка запроса, создание ответа.
                 Request request = Request.GetRequest(data);
                 Response response = Response.From(request);
-                response.Post(client.GetStream());
+                //тут баг
+                try
+                {
+                    response.Post(client.GetStream());
+                }catch(Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
 
             }
 
         }
-
+        
         //TODO: функция возвращает локальный ИП 
         private string GetMyLocalIp()
         {
