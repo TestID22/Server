@@ -10,11 +10,11 @@ namespace HttpServer
         public string url;
         public string type;
 
-        private Request(string host, string url, string directory)
+        private Request(string host, string url, string type)
         {
             this.host = host;
             this.url = url;
-            this.type = directory;
+            this.type = type;
         }
 
 
@@ -27,7 +27,7 @@ namespace HttpServer
             string[] data = clientData.Split("\n");
 
             Console.WriteLine($"Hots {data[1]}\n, URL = {data[0].Split(" ")[1]}\n, Type :{data[0].Split(" ")[0]}\n");
-            return new Request(data[3], data[1], data[0]);
+            return new Request(data[3], data[1], data[0].Split(" ")[0]);
         }
     }
 }

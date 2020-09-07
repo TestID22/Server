@@ -26,26 +26,34 @@ namespace HttpServer
             }
             else if(request.type.ToUpper() == "GET")
             {
-                return Index();
+                return IndexFileInfo();
             }
             return null;
 
         }
 
-        //переделать под индекс
-        private static Response Index()
+        //переделать под индекс, никакого Hardcode TODO константы сделать, сконфигурировать директорию, под html.
+        private static Response IndexStreamReader()
         {
-            string html = " ";
             using (StreamReader sr = new StreamReader("index.html"))
             {
-                html = sr.ReadToEnd();
+                byte[] localData = Encoding.ASCII.GetBytes(sr.ReadToEnd());
                 sr.Close();
+                return new Response("200 OK", "text/html", localData);
             }
-
-            byte[] localData = Encoding.ASCII.GetBytes(html);
-            Response index = new Response("200", "text / html", localData);
-            return index;
         }
+
+        private static Response IndexFileInfo()
+        {
+            FileInfo fileInfo = new FileInfo("index.html");
+            FileStream fs = fileInfo.OpenRead();
+            byte[] data = new byte[fs.Length];
+            BinaryReader binaryReader = new BinaryReader(fs);
+            binaryReader.Read(data, 0, data.Length);
+
+            return new Response("200 OK", "text/html", data);
+        }
+
 
         private static Response MakeNullRequest()
         {
